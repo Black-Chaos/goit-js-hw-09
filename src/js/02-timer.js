@@ -12,58 +12,58 @@ const refsTimer = {
   input: document.getElementById('datetime-picker'),
 };
 
-let selectedDate = null;
+const timer = {
+  time: null,
+  delay: 1000,
+  idInterval: null,
+  start() {
+    refsTimer.input.disabled = true;
+    startBtn.disabled = true;
+    this.idInterval = setInterval(this.process.bind(timer), this.delay);
+  },
+  process() {
+    if (this.time <= this.delay) return clearInterval(this.idInterval);
+    this.time -= this.delay;
+    renderTimer(this.time);
+  },
+};
+
 const options = {
   enableTime: true,
   time_24hr: true,
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-    selectedDate = selectedDates[0].getTime() - Date.now();
-    checkDate(selectedDate);
+    timer.time = selectedDates[0].getTime() - Date.now();
+    if (checkDate(timer.time)) {
+      renderTimer(timer.time);
+    } else {
+      renderTimer();
+    }
   },
 };
 flatpickr('#datetime-picker', options);
 
-const timer = {
-  delay: 1000,
-  isActive: false,
-  idInterval: null,
-  start() {
-    if (this.isActive) {
-      return;
-      }
-    refsTimer.input.disabled = true;
-    startBtn.disabled = true;
-    this.idInterval = setInterval(this.process.bind(timer), this.delay);
-  },
-  process() {
-    if (selectedDate <= 1000) clearInterval(this.idInterval);
-    this.isActive = true;
-    initTimer(selectedDate);
-    selectedDate -= this.delay;
-  },
-};
-
 function checkDate(date) {
-  if (date > 0) {
-    initTimer(selectedDate);
+  const startTimer = timer.start.bind(timer);
+  const check = date > 0;
+  if (check) {
     startBtn.disabled = false;
-    startBtn.addEventListener('click', timer.start.bind(timer));
+    startBtn.addEventListener('click', startTimer);
   } else {
-    initTimer(0);
     Notify.failure('Please choose a date in the future');
     startBtn.disabled = true;
-    startBtn.removeEventListener('click', timer.start.bind(timer));
+    startBtn.removeEventListener('click', startTimer);
   }
+  return check;
 }
 
-function initTimer(date) {
+function renderTimer(date) {
   if (!date) {
-    refsTimer.days.textContent = 0;
-    refsTimer.hours.textContent = 0;
-    refsTimer.minutes.textContent = 0;
-    refsTimer.seconds.textContent = 0;
+    refsTimer.days.textContent = '00';
+    refsTimer.hours.textContent = '00';
+    refsTimer.minutes.textContent = '00';
+    refsTimer.seconds.textContent = '00';
     return;
   }
   const { days, hours, minutes, seconds } = convertMs(date);

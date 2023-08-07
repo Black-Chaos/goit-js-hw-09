@@ -16,3 +16,22 @@ img {
   display: block;
   max-width: 100%;
 }
+
+.timer {
+  padding: 20px;
+  display: flex;
+  gap: 50px;
+}
+
+.field {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  background-color: #9cca46;
+}
+.value {
+  color: #fff;
+  font-size: 48px;
+  line-height: 1.2;
+}
